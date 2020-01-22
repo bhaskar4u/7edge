@@ -51,7 +51,7 @@ router.post("/signin", async (req, res) => {
       };
       //generating the token
       let token = jwt.sign(payload, secretkey, {
-        expiresIn: 20000
+        expiresIn: 2000
       });
       res.send(token);
     } else {
@@ -63,29 +63,29 @@ router.post("/signin", async (req, res) => {
 });
 
 //creating post-route for update the user field
-router.post("/update/:id", async (req, res) => {
-  await User.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true
-  })
-    .then(updateduser => {
-      res.send({ updateduser });
-    })
-    .catch(err => {
-      res.send(err);
-    });
+router.post("/update/:id", verifyToken, async (req, res) => {
+  jwt.verify(req.token, secretkey, {});
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    );
+    res.status(200).send({ updatedUser });
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
 //creating get-route for displaying the All users
-router.get("/list", async (req, res) => {
-  await User.find({})
-    .then(users => {
-      res.status(200).send({
-        users
-      });
-    })
-    .catch(err => {
-      res.status(404).send(err);
-    });
+router.get("/list", verifyToken, async (req, res) => {
+  jwt.verify(req.token, secretkey, {});
+  try {
+    const users = await User.find({});
+    res.status(200).send({ users });
+  } catch (err) {
+    res.status(404).send(err);
+  }
 });
 
 //creating delete-route for delete the particular user by using id
@@ -99,4 +99,16 @@ router.delete("/delete/:id", async (req, res) => {
     });
 });
 
+function verifyToken(req, res, next) {
+  //get Auth Header value
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader != "undefined") {
+    const bearer = bearerHeader;
+    const beareToken = bearer;
+    req.token = beareToken;
+    next();
+  } else {
+    res.send(403);
+  }
+}
 module.exports = router;
