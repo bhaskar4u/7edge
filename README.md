@@ -7,4 +7,6 @@
 7)use post-method "http://localhost:5000/user/signin" and fill your given credential to signin
 8)use post-method "http://localhost:5000/user/update/:id" for update the user field
 9)use delete-method "http://localhost:5000/user/delete/:id" for delete the particular user with id
-10)use get-method "http://localhost:5000/user/list" for generating the list of all users (/list/ is not protected route)
+10)use get-method "http://localhost:5000/user/list" for generating the list of all users
+11)Login with credential for generating the token
+12)"update" and "list" route is protected
